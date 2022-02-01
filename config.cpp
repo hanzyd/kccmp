@@ -25,6 +25,7 @@
 
 #include <stdexcept>
 #include <fstream>
+#include <regex>
 
 config::~config()
 {
@@ -54,7 +55,7 @@ config::read(
 	throw std::runtime_error(buffer);
     }
     char buffer[256];
-    QRegExp cline = get_regex();
+    std::regex cline = get_regex();
     std::string key;
     config_value cv;
     while( in.getline(buffer,255) ) {
@@ -141,25 +142,28 @@ config::analyze(
     }
 }
 
-QRegExp
+std::regex
 config::get_regex() const
 {
-    return QRegExp("(# )?CONFIG_([^= ]+)[ =]+([^\n]+)");
+    return std::regex(std::string("(# )?CONFIG_([^= ]+)[ =]+([^\n]+)"));
 }
 
 
 bool
 config::parse(
-    QRegExp            &exp,
+    std::regex         &exp,
     const char         *line,
     std::string        &key,
     config_value       &cv
     )
 {
-    if( -1 != exp.indexIn(line) ) {
-        key = exp.cap(2).toStdString();
-	std::string value = exp.cap(3).toStdString();
-	if( "# " == exp.cap(1) ) {
+    std::cmatch cm;
+
+    if( regex_match(line, cm, exp) ) {
+        key = cm[2];
+
+	std::string value = cm[3];
+	if( "# " == cm[1] ) {
 	    cv = config_value::No;
 	} else {
 	    if( "m" == value || "M" == value ) {

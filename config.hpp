@@ -26,7 +26,7 @@
 #include <map>
 #include <set>
 #include <string>
-#include <QRegExp>
+#include <regex>
 
 #include "config_value.hpp"
 
@@ -57,8 +57,8 @@ public:
 			 std::set<std::string> &in2 );
     friend class config_test;
 protected:
-    QRegExp get_regex() const;
-    bool parse(QRegExp       &exp,
+    std::regex get_regex() const;
+    bool parse(std::regex    &exp,
 	       const char    *line,
 	       std::string   &key,
 	       config_value  &cv );

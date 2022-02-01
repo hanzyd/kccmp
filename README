@@ -18,11 +18,7 @@ example:
 --------
 Building
 --------
-kccmp depends on Qt 4.x. It uses qmake for generating
-a standard Makefile.
 The standard build is as easy as:
-example:
-% qmake
 % make
 
 http://stoopidsimple.com/kccmp
