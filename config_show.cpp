@@ -22,10 +22,49 @@
  *----------------------------------------------------------------------*/
 
 #include <sstream>
+#include <fstream>
+#include <iomanip>
 
 #include "config.hpp"
 
 using namespace std;
+
+void save_set(const string &filename, const set<string> &diff, const config &c1)
+{
+	std::ofstream file(filename);
+
+	if (!file.is_open()) {
+		std::cout << "Failed to open file" << std::endl;
+		return;
+	}
+
+	for (auto itr = diff.begin(); itr != diff.end(); itr++) {
+		file << setw(32) << itr->c_str() << "\t" << *c1.find(*itr)
+		     << endl;
+	}
+
+	file.flush();
+	file.close();
+}
+
+void save_diff(const string &filename, const set<string> &diff,
+	       const config &c1, const config &c2)
+{
+	std::ofstream file(filename);
+
+	if (!file.is_open()) {
+		std::cout << "Failed to open file" << std::endl;
+		return;
+	}
+
+	for (auto itr = diff.begin(); itr != diff.end(); itr++) {
+		file << setw(32) << itr->c_str() << "\t" << setw(8)
+		     << *c1.find(*itr) << "\t" << *c2.find(*itr) << endl;
+	}
+
+	file.flush();
+	file.close();
+}
 
 void compare(const string &filename1, const string &filename2)
 {
@@ -34,8 +73,12 @@ void compare(const string &filename1, const string &filename2)
 	c1.read(filename1.c_str());
 	c2.read(filename2.c_str());
 	set<string> cunion, diff, in1, in2;
+
 	config::analyze(c1, c2, cunion, diff, in1, in2);
-	cerr << "done!" << endl;
+
+	save_diff("diff.txt", diff, c1, c2);
+	save_set("in1.txt", in1, c1);
+	save_set("in2.txt", in2, c2);
 }
 
 int main(int argc, char **argv)
