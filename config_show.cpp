@@ -74,11 +74,14 @@ void compare(const string &filename1, const string &filename2)
 	c2.read(filename2.c_str());
 	set<string> cunion, diff, in1, in2;
 
+	const string bn1 = filename1.substr(filename1.find_last_of("/\\") + 1);
+	const string bn2 = filename1.substr(filename2.find_last_of("/\\") + 1);
+
 	config::analyze(c1, c2, cunion, diff, in1, in2);
 
-	save_diff("diff.txt", diff, c1, c2);
-	save_set("in1.txt", in1, c1);
-	save_set("in2.txt", in2, c2);
+	save_diff("diff-" + bn1 + "-" + bn2, diff, c1, c2);
+	save_set("only-" + bn1, in1, c1);
+	save_set("only-" + bn2, in2, c2);
 }
 
 int main(int argc, char **argv)
