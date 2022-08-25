@@ -29,59 +29,32 @@
 
 using namespace std;
 
-void save_set(const string &filename, const set<string> &diff, const config &c1)
-{
-	std::ofstream file(filename);
-
-	if (!file.is_open()) {
-		std::cout << "Failed to open file: " + filename << std::endl;
-		return;
-	}
-
-	for (auto itr = diff.begin(); itr != diff.end(); itr++) {
-		file << setw(32) << itr->c_str() << "\t" << *c1.find(*itr)
-		     << endl;
-	}
-
-	file.flush();
-	file.close();
-}
-
-void save_diff(const string &filename, const set<string> &diff,
-	       const config &c1, const config &c2)
-{
-	std::ofstream file(filename);
-
-	if (!file.is_open()) {
-		std::cout << "Failed to open file: " + filename << std::endl;
-		return;
-	}
-
-	for (auto itr = diff.begin(); itr != diff.end(); itr++) {
-		file << setw(32) << itr->c_str() << "\t" << setw(8)
-		     << *c1.find(*itr) << "\t" << *c2.find(*itr) << endl;
-	}
-
-	file.flush();
-	file.close();
-}
-
 void compare(const string &filename1, const string &filename2)
 {
 	config c1;
 	config c2;
 	c1.read(filename1.c_str());
 	c2.read(filename2.c_str());
-	set<string> cunion, diff, in1, in2;
+	set<string> same, diff, in1, in2;
 
-	const string bn1 = filename1.substr(filename1.find_last_of("/\\") + 1);
-	const string bn2 = filename1.substr(filename2.find_last_of("/\\") + 1);
+	config::analyze(c1, c2, same, diff, in1, in2);
 
-	config::analyze(c1, c2, cunion, diff, in1, in2);
+	for (auto itr = diff.begin(); itr != diff.end(); itr++) {
+		std::cout << setw(32) << itr->c_str() << "\t" << setw(8)
+			  << *c1.find(*itr) << "\t" << *c2.find(*itr) << endl;
+	}
 
-	save_diff("diff-" + bn1 + "-" + bn2, diff, c1, c2);
-	save_set("only-" + bn1, in1, c1);
-	save_set("only-" + bn2, in2, c2);
+	for (auto itr = in1.begin(); itr != in1.end(); itr++) {
+		std::cout << setw(32) << itr->c_str() << "\t" << setw(8)
+			  << *c1.find(*itr) << "\t"
+			  << "Missing" << endl;
+	}
+
+	for (auto itr = in2.begin(); itr != in2.end(); itr++) {
+		std::cout << setw(32) << itr->c_str() << "\t" << setw(8)
+			  << "Missing"
+			  << "\t" << *c2.find(*itr) << endl;
+	}
 }
 
 int main(int argc, char **argv)
