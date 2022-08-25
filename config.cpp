@@ -27,6 +27,10 @@
 #include <fstream>
 #include <regex>
 
+#include <limits.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 config::~config()
 {
 }
@@ -42,13 +46,22 @@ config::config(const char *filename)
 
 void config::read(const char *filename)
 {
-	std::ifstream in;
-	in.open(filename);
-	if (!in) {
+	char resolved_name[PATH_MAX];
+
+	if (!realpath(filename, resolved_name)) {
 		char buffer[1024];
-		sprintf(buffer, "cound not load file: %s", filename);
+		snprintf(buffer, sizeof(buffer), "Could not resolve the name: %s", filename);
 		throw std::runtime_error(buffer);
 	}
+
+	std::ifstream in;
+	in.open(resolved_name);
+	if (!in) {
+		char buffer[1024];
+		snprintf(buffer, sizeof(buffer), "Could not load file: %s", filename);
+		throw std::runtime_error(buffer);
+	}
+
 	char buffer[256];
 	std::regex cline = get_regex();
 	std::string key;
