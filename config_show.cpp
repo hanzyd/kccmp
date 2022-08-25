@@ -34,7 +34,7 @@ void save_set(const string &filename, const set<string> &diff, const config &c1)
 	std::ofstream file(filename);
 
 	if (!file.is_open()) {
-		std::cout << "Failed to open file" << std::endl;
+		std::cout << "Failed to open file: " + filename << std::endl;
 		return;
 	}
 
@@ -53,7 +53,7 @@ void save_diff(const string &filename, const set<string> &diff,
 	std::ofstream file(filename);
 
 	if (!file.is_open()) {
-		std::cout << "Failed to open file" << std::endl;
+		std::cout << "Failed to open file: " + filename << std::endl;
 		return;
 	}
 
@@ -87,8 +87,8 @@ void compare(const string &filename1, const string &filename2)
 int main(int argc, char **argv)
 {
 	if (3 != argc) {
-		cerr << "symtax error, should be:" << endl;
-		cerr << "% " << argv[0] << " config_file1 config_file2" << endl;
+		cerr << "Usage:" << endl;
+		cerr << argv[0] << " config1 config2" << endl;
 		exit(-1);
 	}
 	int result;
@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 		cerr << e.what() << endl;
 		result = 2;
 	} catch (...) {
-		cerr << "caught unhandled exception" << endl;
+		cerr << "Caught unhandled exception" << endl;
 		result = 1;
 	}
 	return result;
